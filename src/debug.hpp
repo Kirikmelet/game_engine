@@ -2,8 +2,7 @@
 
 #include <optional>
 #include <vector>
-#include <vulkan/vk_platform.h>
-#include <vulkan/vulkan_core.h>
+#include <vulkan/vulkan.hpp>
 namespace game::engine {
 #ifdef NDEBUG
 const bool kEnableValidationLayer = false;
@@ -17,17 +16,20 @@ const std::vector<const char *> kVkValidationLayers = {
 bool CheckValidationLayerSupport();
 namespace debug {
 VKAPI_ATTR VkBool32 VKAPI_CALL
-DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
-              VkDebugUtilsMessageTypeFlagsEXT message_type,
+DebugCallback(vk::DebugUtilsMessageSeverityFlagBitsEXT message_severity,
+              vk::DebugUtilsMessageTypeFlagsEXT message_type,
               const VkDebugUtilsMessengerCallbackDataEXT *message_callback_data,
               void *message_user_data);
-VkDebugUtilsMessengerCreateInfoEXT GetDebugCreateInfo();
-std::optional<VkDebugUtilsMessengerEXT>
-CreateDebugMessenger(VkInstance instance,
-                     const VkAllocationCallbacks *allocator,
-                     VkDebugUtilsMessengerEXT &create_info);
-void DestroyDebugMessenger(VkInstance instance,
-                           VkDebugUtilsMessengerEXT messenger,
-                           const VkAllocationCallbacks *allocator);
+vk::DebugUtilsMessengerCreateInfoEXT GetDebugCreateInfo();
+std::optional<vk::DebugUtilsMessengerEXT>
+CreateDebugMessenger(vk::Instance instance,
+                     const vk::AllocationCallbacks *allocator,
+                     vk::DebugUtilsMessengerCreateInfoEXT const &create_info,
+                     vk::DispatchLoaderDynamic& dldy);
+void DestroyDebugMessenger(vk::Instance instance,
+                           vk::DebugUtilsMessengerEXT messenger,
+                           const vk::AllocationCallbacks *allocator,
+                           vk::DispatchLoaderDynamic& dldy);
+// DebugCleanup()
 } // namespace debug
 } // namespace game::engine

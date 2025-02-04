@@ -10,66 +10,100 @@
 #include <cstring>
 #include <memory>
 #include <vector>
-#include <vulkan/vulkan_core.h>
+#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan_handles.hpp>
+#include <vulkan/vulkan_structs.hpp>
 
 namespace game::engine {
 
 Application::Application(const char *title) {
 
-  vkAppInfo_ = {
-      .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-      .pNext = nullptr,
-      .pApplicationName = title,
-      .applicationVersion = VK_MAKE_VERSION(0, 0, 1),
-      .pEngineName = "engine",
-      .apiVersion = VK_API_VERSION_1_3,
-  };
-
+  // vkappinfo_ = {
+  //     .stype = vk_structure_type_application_info,
+  //     .pnext = nullptr,
+  //     .papplicationname = title,
+  //     .applicationversion = vk_make_version(0, 0, 1),
+  //     .penginename = "engine",
+  //     .apiversion = vk_api_version_1_3,
+  // };
+  vkAppInfo_ = vk::ApplicationInfo{title,
+                                   VK_MAKE_VERSION(0, 0, 1),
+                                   "engine",
+                                   VK_MAKE_VERSION(0, 0, 1),
+                                   VK_API_VERSION_1_3,
+                                   nullptr};
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
   window_ = std::shared_ptr<Window>(_InitWindow(title, vkAppInfo_));
   if (!window_->IsValid()) {
     throw -1;
   }
-  vkInstance_ = _initVkInstance();
+  try {
+    vkInstance_ = _initVkInstance(vkAppInfo_);
+  } catch (const vk::SystemError &error) {
+    SDL_Log("%i: %s - %s", error.code().value(), error.code().message().c_str(),
+            error.what());
+    exit(-1);
+  }
+  vkDldy_ = vk::DispatchLoaderDynamic(vkInstance_, vkGetInstanceProcAddr);
+  auto maybe_messenger = _initDebugMessenger(vkInstance_, vkDldy_);
+  if (maybe_messenger.has_value()) {
+    vkDebugMessenger_ = maybe_messenger.value();
+  } else {
+    SDL_Log("%s", "No debugger?");
+  }
   SDL_zero(event_);
 }
 
-Application::~Application() { SDL_Quit(); }
+Application::~Application() {
+  if (kEnableValidationLayer) {
+    debug::DestroyDebugMessenger(vkInstance_, vkDebugMessenger_, nullptr, vkDldy_);
+  }
+  vkInstance_.destroy();
+  SDL_Quit();
+}
 
 Window *Application::_InitWindow(const char *title,
-                                 VkApplicationInfo &vkAppInfo) {
+                                 vk::ApplicationInfo &vkAppInfo) {
   return new Window(title, 680, 480);
 }
 
-VkInstance Application::_initVkInstance() {
-  VkInstance instance;
+VkInstance Application::_initVkInstance(vk::ApplicationInfo &vkAppInfo) {
   uint32_t extension_count = 0;
   char const *const *sdl_vulkan_extension_names = 0;
   sdl_vulkan_extension_names =
       SDL_Vulkan_GetInstanceExtensions(&extension_count);
   std::vector<const char *> extension_names(
       sdl_vulkan_extension_names, sdl_vulkan_extension_names + extension_count);
+  std::vector<const char *> enabled_layers;
   extension_names.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
   if (kEnableValidationLayer && CheckValidationLayerSupport()) {
-    extension_names.insert(extension_names.end(), kVkValidationLayers.begin(),
-                           kVkValidationLayers.end());
+    enabled_layers.insert(enabled_layers.end(), kVkValidationLayers.begin(),
+                          kVkValidationLayers.end());
+    // Enable debug util
+    extension_names.push_back(vk::EXTDebugUtilsExtensionName);
   }
   for (const char *name : extension_names) {
     SDL_Log("%s", name);
   }
-  VkDebugUtilsMessengerEXT debugInfo = {};
-  VkInstanceCreateInfo initial_vkInstanceCreateInfo{
-      .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-      .pNext = debugInfo,
-      .enabledLayerCount = 0,
-      .enabledExtensionCount = static_cast<uint32_t>(extension_names.size()),
-      .ppEnabledExtensionNames = extension_names.data(),
-  };
-  VkResult vkResult =
-      vkCreateInstance(&initial_vkInstanceCreateInfo, nullptr, &instance);
-  return instance;
+  auto debug_create_info = debug::GetDebugCreateInfo();
+  vk::InstanceCreateInfo initial_vkInstanceCreateInfo(
+      {}, &vkAppInfo, static_cast<uint32_t>(enabled_layers.size()),
+      enabled_layers.data(), static_cast<uint32_t>(extension_names.size()),
+      extension_names.data(),
+      reinterpret_cast<vk::DebugUtilsMessengerCreateInfoEXT *>(
+          &debug_create_info));
+  // VkResult vkResult =
+  //     vkCreateInstance(&initial_vkInstanceCreateInfo, nullptr, &instance);
+  return vk::createInstance(initial_vkInstanceCreateInfo);
 }
 
+std::optional<vk::DebugUtilsMessengerEXT> Application::_initDebugMessenger(vk::Instance instance, vk::DispatchLoaderDynamic dldy) {
+  if (!kEnableValidationLayer) {
+    return std::nullopt;
+  }
+ vk::DebugUtilsMessengerCreateInfoEXT debug_create_info = debug::GetDebugCreateInfo();
+ return debug::CreateDebugMessenger(instance, nullptr, debug_create_info, dldy);
+}
 
 int Application::run() {
   bool quit = false;

@@ -1,8 +1,32 @@
 [
 {
   "directory": "/home/troyd/projects/game/build",
-  "command": "/usr/bin/c++  -isystem /home/troyd/opt/vulkansdk/1.3.296.0/x86_64/include -std=gnu++23 -o CMakeFiles/game.dir/src/main.cpp.o -c /home/troyd/projects/game/src/main.cpp",
+  "command": "/usr/bin/c++ -isystem /home/troyd/opt/vulkansdk/1.3.296.0/x86_64/include -std=gnu++23 -fmodules-ts -fmodule-mapper=CMakeFiles/game.dir/src/app.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o CMakeFiles/game.dir/src/app.cpp.o -c /home/troyd/projects/game/src/app.cpp",
+  "file": "/home/troyd/projects/game/src/app.cpp",
+  "output": "CMakeFiles/game.dir/src/app.cpp.o"
+},
+{
+  "directory": "/home/troyd/projects/game/build",
+  "command": "/usr/bin/c++ -isystem /home/troyd/opt/vulkansdk/1.3.296.0/x86_64/include -std=gnu++23 -fmodules-ts -fmodule-mapper=CMakeFiles/game.dir/src/debug.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o CMakeFiles/game.dir/src/debug.cpp.o -c /home/troyd/projects/game/src/debug.cpp",
+  "file": "/home/troyd/projects/game/src/debug.cpp",
+  "output": "CMakeFiles/game.dir/src/debug.cpp.o"
+},
+{
+  "directory": "/home/troyd/projects/game/build",
+  "command": "/usr/bin/c++ -isystem /home/troyd/opt/vulkansdk/1.3.296.0/x86_64/include -std=gnu++23 -fmodules-ts -fmodule-mapper=CMakeFiles/game.dir/src/device.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o CMakeFiles/game.dir/src/device.cpp.o -c /home/troyd/projects/game/src/device.cpp",
+  "file": "/home/troyd/projects/game/src/device.cpp",
+  "output": "CMakeFiles/game.dir/src/device.cpp.o"
+},
+{
+  "directory": "/home/troyd/projects/game/build",
+  "command": "/usr/bin/c++ -isystem /home/troyd/opt/vulkansdk/1.3.296.0/x86_64/include -std=gnu++23 -fmodules-ts -fmodule-mapper=CMakeFiles/game.dir/src/main.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o CMakeFiles/game.dir/src/main.cpp.o -c /home/troyd/projects/game/src/main.cpp",
   "file": "/home/troyd/projects/game/src/main.cpp",
   "output": "CMakeFiles/game.dir/src/main.cpp.o"
+},
+{
+  "directory": "/home/troyd/projects/game/build",
+  "command": "/usr/bin/c++ -isystem /home/troyd/opt/vulkansdk/1.3.296.0/x86_64/include -std=gnu++23 -fmodules-ts -fmodule-mapper=CMakeFiles/game.dir/src/window.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o CMakeFiles/game.dir/src/window.cpp.o -c /home/troyd/projects/game/src/window.cpp",
+  "file": "/home/troyd/projects/game/src/window.cpp",
+  "output": "CMakeFiles/game.dir/src/window.cpp.o"
 }
 ]
