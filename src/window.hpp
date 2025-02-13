@@ -11,5 +11,6 @@ public:
   ~Window();
 
   bool IsValid() const;
+  SDL_Window* GetRawWindow();
 };
 } // namespace game::engine
