@@ -9,19 +9,19 @@
 
 namespace game::engine {
 bool CheckValidationLayerSupport() {
-  uint32_t layer_count;
-  vkEnumerateInstanceLayerProperties(&layer_count, nullptr);
-  std::vector<vk::LayerProperties> available_properties(layer_count);
+  uint32_t layerCount;
+  vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+  std::vector<vk::LayerProperties> availableProperties(layerCount);
   vk::Result vkResult1 = vk::enumerateInstanceLayerProperties(
-      &layer_count, available_properties.data());
-  for (const char *layer_name : kVkValidationLayers) {
-    bool layer_found = false;
-    for (const vk::LayerProperties &layer_property : available_properties) {
-      if (strcmp(layer_name, layer_property.layerName) == 0) {
-        layer_found = true;
+      &layerCount, availableProperties.data());
+  for (const char *layerName : kVkValidationLayers) {
+    bool layerFound = false;
+    for (const vk::LayerProperties &layerProperty : availableProperties) {
+      if (strcmp(layerName, layerProperty.layerName) == 0) {
+        layerFound = true;
       }
     }
-    if (!layer_found) {
+    if (!layerFound) {
       return false;
     }
   }
